@@ -60,17 +60,11 @@ public class WebServer {
         server.setHandler(getServletContextHandler());
         try {
             server.start();
+            LOG.info("Server started at port {}", port);
             server.join();
         } catch (Exception ex) {
-            System.out.println("*****" + ex);
-        } finally {
-//            if (webappContext.getUnavailableException() != null) {
-//                // loading spring configuration failed
-//                stopServer();
-//                LOG.error("Could not start server at port {}", port);
-//            } else {
-//                LOG.info("Server started at port {}", port);
-//            }
+            LOG.error("Could not start server at port {}: {}", port, ex.getMessage());
+            stopServer();
         }
     }
 
@@ -106,10 +100,7 @@ public class WebServer {
 
     private WebApplicationContext getContext() {
         AnnotationConfigWebApplicationContext mvcContext = new AnnotationConfigWebApplicationContext();
-        mvcContext.setConfigLocation("stivlo.house.config"); //configPackage
-
-        // mvcContext.register(stivlo.house.config.WebConfig.class);
-
+        mvcContext.setConfigLocation(configPackage);
         mvcContext.getEnvironment().setDefaultProfiles(profile);
         return mvcContext;
     }
