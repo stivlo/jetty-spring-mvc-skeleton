@@ -42,27 +42,27 @@ public class Application implements Daemon {
         DateTimeZone.setDefault(DateTimeZone.UTC);
         LOG = LoggerFactory.getLogger(Application.class);
         loadProperties();
-        LOG.info("Starting up {}...", getProperty(APP_NAME_PROPERTY));
+        LOG.info("Starting up {}...", getStringProperty(APP_NAME_PROPERTY));
 
         webServer = new WebServer();
-        webServer.setConfigPackage(getProperty(APP_CONFIG_PACKAGE_PROPERTY));
+        webServer.setConfigPackage(getStringProperty(APP_CONFIG_PACKAGE_PROPERTY));
         webServer.setPort(getIntProperty(APP_PORT_PROPERTY));
-        webServer.setContextPath(getProperty(APP_PATH_PROPERTY));
-        webServer.setProfile(getProperty(APP_PROFILE_PROPERTY));
+        webServer.setContextPath(getStringProperty(APP_PATH_PROPERTY));
+        webServer.setProfile(getStringProperty(APP_PROFILE_PROPERTY));
         webServer.setMaxThreads(getIntProperty(APP_MAX_THREADS_PROPERTY));
         webServer.setIdleTimeout(getIntProperty(APP_IDLE_TIMEOUT_PROPERTY));
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() throws IOException {
         webServer.startServer();
     }
 
     @Override
-    public void stop() throws Exception {
-        LOG.info("Shutting down {}...", getProperty(APP_NAME_PROPERTY));
+    public void stop() {
+        LOG.info("Shutting down {}...", getStringProperty(APP_NAME_PROPERTY));
         webServer.stopServer();
-        LOG.info("{} shutdown complete", getProperty(APP_NAME_PROPERTY));
+        LOG.info("{} shutdown complete", getStringProperty(APP_NAME_PROPERTY));
     }
 
     @Override
@@ -70,24 +70,24 @@ public class Application implements Daemon {
         webServer = null;
     }
 
-    private String getProperty(String propertyName) {
-        try {
-            return properties.getProperty(propertyName);
-        } catch (Exception ex) {
+    private String getStringProperty(String propertyName) {
+        String value = properties.getProperty(propertyName);
+        if (value == null) {
             LOG.error("Could not read property " + propertyName);
             System.exit(1);
             return ""; // to shut up the compiler
         }
+        return value;
     }
 
     private int getIntProperty(String propertyName) {
-        try {
-            return Integer.parseInt(properties.getProperty(APP_PORT_PROPERTY));
-        } catch (Exception ex) {
-            LOG.error("Could not read property " + APP_PORT_PROPERTY);
+        String value = properties.getProperty(propertyName);
+        if (value == null) {
+            LOG.error("Could not read property " + propertyName);
             System.exit(1);
             return -1; // to shut up the compiler
         }
+        return Integer.parseInt(value);
     }
 
     private void loadProperties() throws IOException {

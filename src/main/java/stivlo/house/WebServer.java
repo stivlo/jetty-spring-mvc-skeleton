@@ -54,7 +54,7 @@ public class WebServer {
         this.idleTimeout = idleTimeout;
     }
 
-    public void startServer() throws Exception {
+    public void startServer() throws IOException {
         LOG.info("Starting server at port {}", port);
         server = createServer(port);
         server.setHandler(getServletContextHandler());
